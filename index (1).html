@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Municipal de Vivienda Vacía - Aibar/Oibar</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="flex items-center justify-between">
+                <div class="logo">
+                    <h1>Banco Municipal de Vivienda Vacía</h1>
+                    <p>Ayuntamiento de Aibar/Oibar</p>
+                </div>
+                <nav class="main-nav">
+                    <ul class="flex gap-8">
+                        <li><a href="#mapa" class="nav-link active" data-tab="mapa">Mapa</a></li>
+                        <li><a href="#registrar" class="nav-link" data-tab="registrar">Registrar Vivienda</a></li>
+                        <li><a href="#buscar" class="nav-link" data-tab="buscar">Buscar Vivienda</a></li>
+                        <li><a href="#admin" class="nav-link" data-tab="admin">Administración</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sección del Mapa -->
+        <section id="mapa" class="tab-content active">
+            <div class="container">
+                <h2>Mapa de Viviendas en Aibar/Oibar</h2>
+                <div class="map-controls flex gap-8 mb-8">
+                    <div class="filter-container">
+                        <label for="filter-estado" class="form-label">Filtrar por estado:</label>
+                        <select id="filter-estado" class="form-control">
+                            <option value="todos">Todas las viviendas</option>
+                            <option value="habitada">Habitadas</option>
+                            <option value="vacia">Vacías</option>
+                            <option value="abandonada">Abandonadas</option>
+                            <option value="en_venta">En venta</option>
+                            <option value="rehabilitacion">En rehabilitación</option>
+                        </select>
+                    </div>
+                    <div class="search-container">
+                        <label for="search-address" class="form-label">Buscar por dirección:</label>
+                        <div class="flex gap-8">
+                            <input type="text" id="search-address" class="form-control" placeholder="Ej: Calle Mayor 17">
+                            <button id="btn-search" class="btn btn--primary">Buscar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+                
+                <div class="map-legend">
+                    <h4>Leyenda</h4>
+                    <ul class="legend-items flex gap-8" id="legend-container">
+                        <!-- Generado dinámicamente por JavaScript -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Registro de Viviendas -->
+        <section id="registrar" class="tab-content">
+            <div class="container">
+                <h2>Registrar Vivienda</h2>
+                <p>Complete el formulario para registrar una vivienda en el Banco Municipal de Vivienda Vacía.</p>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <form id="form-registrar-vivienda">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="reg-direccion" class="form-label">Dirección *</label>
+                                    <input type="text" id="reg-direccion" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-estado" class="form-label">Estado *</label>
+                                    <select id="reg-estado" class="form-control" required>
+                                        <option value="">Seleccione un estado</option>
+                                        <option value="habitada">Habitada</option>
+                                        <option value="vacia">Vacía</option>
+                                        <option value="abandonada">Abandonada</option>
+                                        <option value="en_venta">En venta</option>
+                                        <option value="rehabilitacion">En rehabilitación</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-propietario" class="form-label">Propietario *</label>
+                                    <input type="text" id="reg-propietario" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-contacto" class="form-label">Contacto</label>
+                                    <input type="text" id="reg-contacto" class="form-control" placeholder="Email o teléfono">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-precio" class="form-label">Precio</label>
+                                    <input type="text" id="reg-precio" class="form-control" placeholder="Opcional">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-superficie" class="form-label">Superficie</label>
+                                    <input type="text" id="reg-superficie" class="form-control" placeholder="Ej: 150 m²">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-anio" class="form-label">Año de construcción</label>
+                                    <input type="text" id="reg-anio" class="form-control">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="reg-descripcion" class="form-label">Descripción</label>
+                                    <textarea id="reg-descripcion" class="form-control" rows="4"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-lat" class="form-label">Latitud *</label>
+                                    <input type="number" id="reg-lat" class="form-control" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-lng" class="form-label">Longitud *</label>
+                                    <input type="number" id="reg-lng" class="form-control" step="any" required>
+                                </div>
+                            </div>
+                            <div class="form-footer flex justify-between items-center mt-8">
+                                <p>Los campos marcados con * son obligatorios</p>
+                                <div class="flex gap-8">
+                                    <button type="button" class="btn btn--secondary" id="btn-ubicar-mapa">Ubicar en mapa</button>
+                                    <button type="submit" class="btn btn--primary">Registrar Vivienda</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Búsqueda de Viviendas -->
+        <section id="buscar" class="tab-content">
+            <div class="container">
+                <h2>Buscar Vivienda</h2>
+                <p>Registre su interés en encontrar una vivienda en Aibar/Oibar.</p>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <form id="form-buscar-vivienda">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="buscar-nombre" class="form-label">Nombre completo *</label>
+                                    <input type="text" id="buscar-nombre" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="buscar-contacto" class="form-label">Email/Teléfono *</label>
+                                    <input type="text" id="buscar-contacto" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="buscar-presupuesto" class="form-label">Presupuesto máximo</label>
+                                    <input type="number" id="buscar-presupuesto" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="buscar-estado" class="form-label">Estado deseado *</label>
+                                    <select id="buscar-estado" class="form-control" required>
+                                        <option value="">Seleccione una opción</option>
+                                        <option value="vacia">Vacía para habitar</option>
+                                        <option value="en_venta">En venta</option>
+                                        <option value="rehabilitacion">Para rehabilitar</option>
+                                        <option value="cualquiera">Cualquier estado</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="buscar-superficie-min" class="form-label">Superficie mínima (m²)</label>
+                                    <input type="number" id="buscar-superficie-min" class="form-control">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="buscar-comentarios" class="form-label">Requisitos adicionales</label>
+                                    <textarea id="buscar-comentarios" class="form-control" rows="4" placeholder="Indique cualquier requisito o preferencia adicional"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-footer flex justify-between items-center mt-8">
+                                <p>Los campos marcados con * son obligatorios</p>
+                                <button type="submit" class="btn btn--primary">Registrar Interés</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Matches sugeridos -->
+                <div class="matches-container mt-8" id="matches-container">
+                    <h3>Viviendas que podrían interesarle</h3>
+                    <p>Basado en sus criterios, estas viviendas podrían ser adecuadas:</p>
+                    <div id="matches-list" class="matches-grid">
+                        <!-- Generado dinámicamente por JavaScript -->
+                        <p class="no-matches">Complete el formulario para ver sugerencias de viviendas</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Administración -->
+        <section id="admin" class="tab-content">
+            <div class="container">
+                <h2>Panel de Administración</h2>
+                
+                <!-- Formulario de Login -->
+                <div id="admin-login" class="card">
+                    <div class="card__body">
+                        <form id="form-admin-login">
+                            <div class="form-group">
+                                <label for="admin-password" class="form-label">Contraseña de administrador</label>
+                                <input type="password" id="admin-password" class="form-control" required>
+                            </div>
+                            <div class="form-footer mt-8">
+                                <button type="submit" class="btn btn--primary">Acceder</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Panel de administración (oculto inicialmente) -->
+                <div id="admin-panel" class="admin-panel hidden">
+                    <div class="admin-nav">
+                        <ul class="flex gap-8">
+                            <li><button class="btn btn--secondary active" data-admin-tab="viviendas">Viviendas</button></li>
+                            <li><button class="btn btn--secondary" data-admin-tab="interesados">Interesados</button></li>
+                            <li><button class="btn btn--secondary" data-admin-tab="estadisticas">Estadísticas</button></li>
+                            <li><button class="btn btn--secondary" data-admin-tab="datos">Gestión de Datos</button></li>
+                        </ul>
+                    </div>
+
+                    <!-- Gestión de Viviendas -->
+                    <div class="admin-content active" id="admin-viviendas">
+                        <h3>Gestión de Viviendas</h3>
+                        <div class="admin-controls flex gap-8 mb-8">
+                            <button id="btn-exportar-viviendas" class="btn btn--primary">Exportar a CSV</button>
+                            <button id="btn-nueva-vivienda" class="btn btn--primary">Nueva Vivienda</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table" id="tabla-viviendas">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Dirección</th>
+                                        <th>Estado</th>
+                                        <th>Propietario</th>
+                                        <th>Superficie</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Generado dinámicamente por JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Gestión de Interesados -->
+                    <div class="admin-content" id="admin-interesados">
+                        <h3>Gestión de Interesados</h3>
+                        <div class="admin-controls flex gap-8 mb-8">
+                            <button id="btn-exportar-interesados" class="btn btn--primary">Exportar a CSV</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table" id="tabla-interesados">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Contacto</th>
+                                        <th>Estado deseado</th>
+                                        <th>Presupuesto</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Generado dinámicamente por JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="admin-content" id="admin-estadisticas">
+                        <h3>Estadísticas del Parque Inmobiliario</h3>
+                        <div class="stats-container">
+                            <div class="stats-grid">
+                                <div class="card stat-card">
+                                    <div class="card__body">
+                                        <h4>Total de Viviendas</h4>
+                                        <div class="stat-value" id="stat-total-viviendas">0</div>
+                                    </div>
+                                </div>
+                                <div class="card stat-card">
+                                    <div class="card__body">
+                                        <h4>Viviendas Vacías</h4>
+                                        <div class="stat-value" id="stat-viviendas-vacias">0</div>
+                                    </div>
+                                </div>
+                                <div class="card stat-card">
+                                    <div class="card__body">
+                                        <h4>Interesados</h4>
+                                        <div class="stat-value" id="stat-total-interesados">0</div>
+                                    </div>
+                                </div>
+                                <div class="card stat-card">
+                                    <div class="card__body">
+                                        <h4>Posibles Matches</h4>
+                                        <div class="stat-value" id="stat-total-matches">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="charts-container mt-8">
+                                <div class="card">
+                                    <div class="card__body">
+                                        <h4>Distribución de Viviendas por Estado</h4>
+                                        <div class="chart-container">
+                                            <canvas id="chart-estados"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gestión de Datos -->
+                    <div class="admin-content" id="admin-datos">
+                        <h3>Gestión de Datos</h3>
+                        <div class="card mb-8">
+                            <div class="card__body">
+                                <h4>Exportar Datos</h4>
+                                <p>Descargue todos los datos de la plataforma en formato CSV.</p>
+                                <div class="flex gap-8 mt-8">
+                                    <button id="btn-exportar-todo" class="btn btn--primary">Exportar Todos los Datos</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card__body">
+                                <h4>Restablecer Datos</h4>
+                                <p class="warning-text">¡Atención! Esta acción eliminará todos los datos actuales y restablecerá la plataforma a su estado inicial.</p>
+                                <div class="flex gap-8 mt-8">
+                                    <button id="btn-restablecer" class="btn btn--danger">Restablecer a Datos Iniciales</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal de Detalles de Vivienda -->
+        <div id="modal-detalle" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-titulo">Detalles de la Vivienda</h3>
+                    <button class="btn-close" id="btn-cerrar-modal">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Contenido generado dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn--secondary" id="btn-contactar">Contactar</button>
+                    <button class="btn btn--primary" id="btn-cerrar">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Edición de Vivienda (para administración) -->
+        <div id="modal-editar" class="modal">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3 id="modal-editar-titulo">Editar Vivienda</h3>
+                    <button class="btn-close" id="btn-cerrar-modal-editar">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-editar-vivienda">
+                        <input type="hidden" id="edit-id">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="edit-direccion" class="form-label">Dirección *</label>
+                                <input type="text" id="edit-direccion" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-estado" class="form-label">Estado *</label>
+                                <select id="edit-estado" class="form-control" required>
+                                    <option value="habitada">Habitada</option>
+                                    <option value="vacia">Vacía</option>
+                                    <option value="abandonada">Abandonada</option>
+                                    <option value="en_venta">En venta</option>
+                                    <option value="rehabilitacion">En rehabilitación</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-propietario" class="form-label">Propietario *</label>
+                                <input type="text" id="edit-propietario" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-contacto" class="form-label">Contacto</label>
+                                <input type="text" id="edit-contacto" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-precio" class="form-label">Precio</label>
+                                <input type="text" id="edit-precio" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-superficie" class="form-label">Superficie</label>
+                                <input type="text" id="edit-superficie" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-anio" class="form-label">Año de construcción</label>
+                                <input type="text" id="edit-anio" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-tipo" class="form-label">Tipo</label>
+                                <input type="text" id="edit-tipo" class="form-control">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="edit-descripcion" class="form-label">Descripción</label>
+                                <textarea id="edit-descripcion" class="form-control" rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-lat" class="form-label">Latitud *</label>
+                                <input type="number" id="edit-lat" class="form-control" step="any" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-lng" class="form-label">Longitud *</label>
+                                <input type="number" id="edit-lng" class="form-control" step="any" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn--danger" id="btn-eliminar">Eliminar</button>
+                    <button class="btn btn--secondary" id="btn-cancelar-editar">Cancelar</button>
+                    <button class="btn btn--primary" id="btn-guardar-editar">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmación -->
+        <div id="modal-confirmacion" class="modal">
+            <div class="modal-content modal-sm">
+                <div class="modal-header">
+                    <h3 id="modal-confirmacion-titulo">Confirmar acción</h3>
+                    <button class="btn-close" id="btn-cerrar-modal-confirmacion">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="modal-confirmacion-mensaje">¿Está seguro que desea realizar esta acción?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn--secondary" id="btn-cancelar-confirmacion">Cancelar</button>
+                    <button class="btn btn--danger" id="btn-confirmar">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p>© 2025 Ayuntamiento de Aibar/Oibar</p>
+                </div>
+                <div>
+                    <p>Banco Municipal de Vivienda Vacía - Plataforma Digital de Gestión</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
